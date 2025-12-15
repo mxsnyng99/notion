@@ -6,26 +6,32 @@
   <style>
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background-color: #f6f3ff;
+      
+      background-color: transparent; /* 완전 투명 */
+      
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
       margin: 0;
     }
+
     .player {
-      background: #ffffff;
+      background: rgba(255,255,255,0.85); /* 반투명 효과 → 노션 배경이 비쳐보임 */
+      backdrop-filter: blur(6px); /* 유리 느낌 */
       padding: 20px 24px;
       border-radius: 18px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
       text-align: center;
       width: 260px;
     }
+
     .title {
       font-size: 18px;
       font-weight: 600;
       margin-bottom: 12px;
     }
+
     audio {
       width: 100%;
     }
@@ -34,9 +40,7 @@
 
 <body>
   <div class="player">
-    <!-- 여기 텍스트만 네가 원하는 걸로 바꾸면 됨 -->
     <div class="title">☆⋆｡𖦹°‧★</div>
-
     <audio controls>
       <source src="likethat.mp3" type="audio/mpeg" />
     </audio>
