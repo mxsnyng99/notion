@@ -2,109 +2,258 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>Wave Player</title>
+  <title>iPod Player</title>
   <style>
     body {
       margin: 0;
       height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       background-color: transparent;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     }
 
-    .player {
-      background-color: #c99a9d;
-      padding: 28px 48px;
-      border-radius: 999px;
+    .ipod {
+      width: 260px;
+      height: 430px;
+      background: #f6f6f6;
+      border-radius: 28px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+      padding: 22px 18px;
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+    }
+
+    .screen {
+      height: 150px;
+      border-radius: 10px;
+      background: #e5e6e7;
+      box-shadow:
+        inset 0 0 0 1px rgba(0,0,0,0.08),
+        inset 0 8px 10px rgba(255,255,255,0.8);
+      padding: 8px 10px;
+      box-sizing: border-box;
+      color: #111;
+      font-size: 11px;
+    }
+
+    .screen-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .screen-top-left {
       display: flex;
       align-items: center;
-      gap: 36px;
-      cursor: pointer;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+      gap: 4px;
+      font-weight: 600;
     }
 
-    .icon-play {
-      width: 0;
-      height: 0;
-      border-top: 16px solid transparent;
-      border-bottom: 16px solid transparent;
-      border-left: 24px solid white;
+    .screen-battery {
+      width: 20px;
+      height: 8px;
+      border-radius: 2px;
+      border: 1px solid #111;
+      position: relative;
     }
 
-    .icon-pause {
+    .screen-battery::before {
+      content: "";
+      position: absolute;
+      right: -3px;
+      top: 2px;
+      width: 2px;
+      height: 4px;
+      background: #111;
+      border-radius: 1px;
+    }
+
+    .screen-battery-fill {
+      width: 70%;
+      height: 100%;
+      background: #111;
+    }
+
+    .menu-list {
+      margin-top: 4px;
+      padding: 0;
+      list-style: none;
+      font-size: 12px;
+    }
+
+    .menu-item {
+      padding: 2px 4px;
       display: flex;
-      gap: 6px;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .icon-pause span {
-      width: 6px;
-      height: 28px;
-      background: white;
+    .menu-item span:last-child {
+      font-size: 10px;
+    }
+
+    .menu-item.active {
+      background: #194a8b;
+      color: #fff;
       border-radius: 3px;
     }
 
-    audio { display: none; }
+    .wheel-wrapper {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .wheel {
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #ffffff, #e5e5e5);
+      box-shadow:
+        inset 0 8px 10px rgba(255,255,255,0.9),
+        inset 0 -6px 10px rgba(0,0,0,0.12);
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .wheel-label {
+      position: absolute;
+      top: 20px;
+      font-size: 12px;
+      letter-spacing: 1px;
+      text-transform: lowercase;
+      color: #888;
+    }
+
+    .wheel-icon {
+      position: absolute;
+      font-size: 12px;
+      color: #888;
+    }
+
+    .wheel-icon.left  { left: 26px;  top: 50%; transform: translateY(-50%); }
+    .wheel-icon.right { right: 26px; top: 50%; transform: translateY(-50%); }
+    .wheel-icon.bottom { bottom: 22px; left: 50%; transform: translateX(-50%); }
+
+    .center-button {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #ffffff, #e4e4e4);
+      box-shadow:
+        inset 0 6px 8px rgba(255,255,255,0.9),
+        inset 0 -4px 8px rgba(0,0,0,0.16);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      cursor: pointer;
+    }
+
+    .ipod.playing .center-button {
+      transform: translateY(1px);
+      box-shadow:
+        inset 0 3px 6px rgba(0,0,0,0.22),
+        inset 0 -2px 4px rgba(255,255,255,0.6);
+    }
+
+    .play-icon {
+      width: 0;
+      height: 0;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      border-left: 16px solid #999;
+    }
+
+    .pause-icon {
+      display: flex;
+      gap: 4px;
+    }
+
+    .pause-icon span {
+      width: 5px;
+      height: 18px;
+      border-radius: 2px;
+      background: #999;
+    }
+
+    audio {
+      display: none;
+    }
   </style>
 </head>
-
 <body>
+  <div class="ipod" id="ipod">
+    <div class="screen">
+      <div class="screen-top">
+        <div class="screen-top-left">
+          <div style="width:8px;height:8px;border-radius:50%;border:1px solid #111;"></div>
+          <span>iPod</span>
+        </div>
+        <div class="screen-battery">
+          <div class="screen-battery-fill"></div>
+        </div>
+      </div>
+      <ul class="menu-list">
+        <li class="menu-item"><span>Playlists</span><span>›</span></li>
+        <li class="menu-item"><span>Artists</span><span>›</span></li>
+        <li class="menu-item active"><span>Songs</span><span>›</span></li>
+        <li class="menu-item"><span>Settings</span><span>›</span></li>
+        <li class="menu-item"><span>About</span><span>›</span></li>
+        <li class="menu-item"><span>Now Playing</span><span>›</span></li>
+      </ul>
+    </div>
 
-  <div class="player" id="player-btn">
-    <div id="icon" class="icon-play"></div>
+    <div class="wheel-wrapper">
+      <div class="wheel">
+        <div class="wheel-label">menu</div>
+        <div class="wheel-icon left">◀◀</div>
+        <div class="wheel-icon right">▶▶</div>
+        <div class="wheel-icon bottom">▶❙❙</div>
 
-    <!-- 1:1 재현 SVG (너가 방금 보낸 이미지 기반) -->
-    <svg width="310" height="70" viewBox="0 0 310 70">
-      <g fill="white">
-
-        <!-- left dot -->
-        <circle cx="10" cy="35" r="3" />
-
-        <!-- left small bars -->
-        <rect x="25" y="25" width="6" height="20" rx="3" />
-        <rect x="40" y="22" width="6" height="26" rx="3" />
-        <rect x="55" y="20" width="6" height="30" rx="3" />
-
-        <!-- center large bars -->
-        <rect x="85" y="10" width="8" height="50" rx="4" />
-        <rect x="105" y="5" width="8" height="60" rx="4" />
-        <rect x="125" y="10" width="8" height="50" rx="4" />
-
-        <!-- right small bars -->
-        <rect x="160" y="20" width="6" height="30" rx="3" />
-        <rect x="175" y="22" width="6" height="26" rx="3" />
-        <rect x="190" y="25" width="6" height="20" rx="3" />
-
-        <!-- right dot -->
-        <circle cx="215" cy="35" r="3" />
-      </g>
-    </svg>
+        <div class="center-button" id="center-button">
+          <div id="center-icon" class="play-icon"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <audio id="audio">
+  <audio id="ipod-audio">
     <source src="likethat.mp3" type="audio/mpeg" />
   </audio>
 
   <script>
-    const btn = document.getElementById("player-btn");
-    const icon = document.getElementById("icon");
-    const audio = document.getElementById("audio");
+    const ipod = document.getElementById("ipod");
+    const centerButton = document.getElementById("center-button");
+    const centerIcon = document.getElementById("center-icon");
+    const audio = document.getElementById("ipod-audio");
 
-    btn.onclick = () => {
-      audio.paused ? audio.play() : audio.pause();
-    };
+    centerButton.addEventListener("click", () => {
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    });
 
-    audio.onplay = () => {
-      icon.className = "icon-pause";
-      icon.innerHTML = "<span></span><span></span>";
-    };
+    audio.addEventListener("play", () => {
+      ipod.classList.add("playing");
+      centerIcon.className = "pause-icon";
+      centerIcon.innerHTML = "<span></span><span></span>";
+    });
 
-    audio.onpause = () => {
-      icon.className = "icon-play";
-      icon.innerHTML = "";
-    };
+    audio.addEventListener("pause", () => {
+      ipod.classList.remove("playing");
+      centerIcon.className = "play-icon";
+      centerIcon.innerHTML = "";
+    });
   </script>
-
 </body>
 </html>
